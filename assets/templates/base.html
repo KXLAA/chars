@@ -14,7 +14,6 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
   </head>
   <body>
     <header>
@@ -25,6 +24,11 @@
     </header>
     <main>{{template "page:main" .}}</main>
     {{template "partial:footer" .}}
+    <script
+      src="/static/js/main.js?version={{.Version}}"
+      type="text/javascript"
+    ></script>
+    <!-- Version: {{.Version}} -->
   </body>
 </html>
 {{end}}

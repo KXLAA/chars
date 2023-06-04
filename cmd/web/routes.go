@@ -16,7 +16,10 @@ func (app *application) routes() http.Handler {
 	fileServer := http.FileServer(http.FS(assets.EmbeddedFiles))
 	mux.Handler("GET", "/static/*filepath", fileServer)
 	mux.HandlerFunc(http.MethodGet, "/", app.home)
-	mux.HandlerFunc(http.MethodPost, "/generate", app.generate)
+	mux.HandlerFunc(http.MethodGet, "/generate", app.generate)
+	mux.HandlerFunc(http.MethodGet, "/generate/bulk", app.generateBulk)
+	mux.HandlerFunc(http.MethodGet, "/api/v1/generate", app.apiGenerate)
+	mux.HandlerFunc(http.MethodGet, "/api/v1/generate/:count", app.apiGenerate)
 
 	return mw.Then(mux)
 }

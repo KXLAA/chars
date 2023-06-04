@@ -170,7 +170,7 @@ h1 {
   gap: 1rem;
   width: 100%;
   justify-content: center;
-  align-items: center;
+  align-items: start;
 }
 
 .generator__output__text {
