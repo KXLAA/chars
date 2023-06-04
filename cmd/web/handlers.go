@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -12,6 +11,7 @@ import (
 
 type configForm struct {
 	Count             int  `form:"Count"`
+	Length            int  `form:"Length"`
 	LowerCase         bool `form:"LowerCase"`
 	UpperCase         bool `form:"UpperCase"`
 	Numbers           bool `form:"Numbers"`
@@ -22,13 +22,15 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	var form configForm
 
-	form.Count = randomNumber(32, 54)
+	form.Length = randomNumber(32, 54)
+	form.Count = 1
 	form.LowerCase = true
 	form.UpperCase = true
 	form.Numbers = true
 	form.SpecialCharacters = true
 
 	result, err := randstring.RandomString(&randstring.Config{
+		Length:            form.Length,
 		Count:             form.Count,
 		LowerCase:         form.LowerCase,
 		UpperCase:         form.UpperCase,
@@ -41,7 +43,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data["RandomString"] = result
+	data["RandomString"] = result[0]
 	data["Form"] = form
 
 	err = response.Page(w, http.StatusOK, data, "pages/home.html")
@@ -52,13 +54,11 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) generate(w http.ResponseWriter, r *http.Request) {
-	count, err := strconv.Atoi(r.URL.Query().Get("count"))
+	length, err := strconv.Atoi(r.URL.Query().Get("length"))
 	lowercase := convertToBool(r.URL.Query().Get("lowercase"))
 	uppercase := convertToBool(r.URL.Query().Get("uppercase"))
 	numbers := convertToBool(r.URL.Query().Get("numbers"))
 	symbols := convertToBool(r.URL.Query().Get("symbols"))
-
-	fmt.Println(count, lowercase, uppercase, numbers, symbols)
 
 	if err != nil {
 		app.badRequest(w, r, err)
@@ -66,7 +66,8 @@ func (app *application) generate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result, err := randstring.RandomString(&randstring.Config{
-		Count:             count,
+		Count:             1,
+		Length:            length,
 		LowerCase:         lowercase,
 		UpperCase:         uppercase,
 		Numbers:           numbers,
@@ -79,9 +80,10 @@ func (app *application) generate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	template := app.newTemplateData(r)
-	template["RandomString"] = result
+	template["RandomString"] = result[0]
 	template["Form"] = configForm{
-		Count:             count,
+		Count:             1,
+		Length:            length,
 		LowerCase:         lowercase,
 		UpperCase:         uppercase,
 		Numbers:           numbers,
@@ -97,7 +99,7 @@ func (app *application) generate(w http.ResponseWriter, r *http.Request) {
 func (app *application) generateBulk(w http.ResponseWriter, r *http.Request) {}
 
 func (app *application) apiGenerate(w http.ResponseWriter, r *http.Request) {
-	count, err := strconv.Atoi(r.URL.Query().Get("count"))
+	length, err := strconv.Atoi(r.URL.Query().Get("length"))
 	lowercase := convertToBool(r.URL.Query().Get("lowercase"))
 	uppercase := convertToBool(r.URL.Query().Get("uppercase"))
 	numbers := convertToBool(r.URL.Query().Get("numbers"))
@@ -109,7 +111,8 @@ func (app *application) apiGenerate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result, err := randstring.RandomString(&randstring.Config{
-		Count:             count,
+		Count:             1,
+		Length:            length,
 		LowerCase:         lowercase,
 		UpperCase:         uppercase,
 		Numbers:           numbers,
@@ -122,7 +125,7 @@ func (app *application) apiGenerate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = response.JSON(w, http.StatusOK, map[string]string{
-		"randomString": result,
+		"randomString": result[0],
 	})
 	if err != nil {
 		app.serverError(w, r, err)

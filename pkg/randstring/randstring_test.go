@@ -1,12 +1,15 @@
 package randstring
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestRandomString(t *testing.T) {
 
-	t.Run("Generates the correct number of characters based on count", func(t *testing.T) {
+	t.Run("Generates the correct number of characters based on Length", func(t *testing.T) {
 		config := Config{
-			Count:             50,
+			Length:            32,
+			Count:             1,
 			LowerCase:         true,
 			UpperCase:         true,
 			Numbers:           true,
@@ -14,20 +17,24 @@ func TestRandomString(t *testing.T) {
 		}
 
 		result, _ := RandomString(&config)
-		if len(result) != 50 {
-			t.Errorf("Expected string of length 10, got %d", len(result))
+		length := len(result[0])
+
+		if length != 32 {
+			t.Errorf("Expected string of length 10, got %d", length)
 		}
 	})
 
 	t.Run("Generates string with lower case, upper case, numbers and special characters", func(t *testing.T) {
 		config := Config{
-			Count:             50,
+			Length:            32,
+			Count:             1,
 			LowerCase:         true,
 			UpperCase:         true,
 			Numbers:           true,
 			SpecialCharacters: true,
 		}
-		result, _ := RandomString(&config)
+		results, _ := RandomString(&config)
+		result := results[0]
 		if !containsLowerCase(result) {
 			t.Errorf("Expected string to contain lower case characters, got %s", result)
 		}
@@ -47,14 +54,16 @@ func TestRandomString(t *testing.T) {
 
 	t.Run("Generates random string with only lower case characters ", func(t *testing.T) {
 		config := Config{
-			Count:             50,
+			Length:            32,
+			Count:             1,
 			LowerCase:         true,
 			UpperCase:         false,
 			Numbers:           false,
 			SpecialCharacters: false,
 		}
 
-		result, _ := RandomString(&config)
+		results, _ := RandomString(&config)
+		result := results[0]
 		if !containsLowerCase(result) {
 			t.Errorf("Expected string to contain lower case characters, got %s", result)
 		}
@@ -62,14 +71,16 @@ func TestRandomString(t *testing.T) {
 
 	t.Run("Generates random string with only upper case characters ", func(t *testing.T) {
 		config := Config{
-			Count:             50,
+			Length:            32,
+			Count:             1,
 			LowerCase:         false,
 			UpperCase:         true,
 			Numbers:           false,
 			SpecialCharacters: false,
 		}
 
-		result, _ := RandomString(&config)
+		results, _ := RandomString(&config)
+		result := results[0]
 		if !containsUpperCase(result) {
 			t.Errorf("Expected string to contain upper case characters, got %s", result)
 		}
@@ -77,14 +88,16 @@ func TestRandomString(t *testing.T) {
 
 	t.Run("Generates random string with only numbers ", func(t *testing.T) {
 		config := Config{
-			Count:             50,
+			Length:            32,
+			Count:             1,
 			LowerCase:         false,
 			UpperCase:         false,
 			Numbers:           true,
 			SpecialCharacters: false,
 		}
 
-		result, _ := RandomString(&config)
+		results, _ := RandomString(&config)
+		result := results[0]
 		if !containsNumbers(result) {
 			t.Errorf("Expected string to contain numbers, got %s", result)
 		}
@@ -92,16 +105,36 @@ func TestRandomString(t *testing.T) {
 
 	t.Run("Generates random string with only special characters ", func(t *testing.T) {
 		config := Config{
-			Count:             50,
+			Length:            32,
+			Count:             1,
 			LowerCase:         false,
 			UpperCase:         false,
 			Numbers:           false,
 			SpecialCharacters: true,
 		}
 
-		result, _ := RandomString(&config)
+		results, _ := RandomString(&config)
+		result := results[0]
 		if !containsSpecialCharacters(result) {
 			t.Errorf("Expected string to contain special characters, got %s", result)
+		}
+	})
+
+	t.Run("Generates correct number of random strings based on count", func(t *testing.T) {
+		want := 100
+		config := Config{
+			Length:            32,
+			Count:             want,
+			LowerCase:         true,
+			UpperCase:         true,
+			Numbers:           true,
+			SpecialCharacters: true,
+		}
+
+		results, _ := RandomString(&config)
+		length := len(results)
+		if length != 100 {
+			t.Errorf("Expected %d random strings, got %d", want, length)
 		}
 	})
 
