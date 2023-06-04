@@ -1,0 +1,4 @@
+bin/
+tmp/
+build-errors.log
+.DS_Store

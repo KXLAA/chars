@@ -14,14 +14,15 @@ func main() {
 	upperCase := flag.Bool("uc", false, "whether the random text contains uppercase characters")
 	numbers := flag.Bool("num", false, "whether the random text contains numbers")
 	specialCharacters := flag.Bool("sc", true, "whether the random text contains special characters")
+	count := flag.Int("c", 1, "the number of random strings to generate")
 
 	flag.Parse()
 
-	//Get the count of characters to generate from the command line
+	//Get the length of characters to generate from the command line
 	countArgs := os.Args[1:][0]
 
 	//convert string to int
-	count, err := strconv.Atoi(countArgs)
+	length, err := strconv.Atoi(countArgs)
 
 	if err != nil {
 		fmt.Println("Error: ", err)
@@ -29,7 +30,8 @@ func main() {
 	}
 
 	config := randstring.Config{
-		Count:             count,
+		Length:            length,
+		Count:             *count,
 		LowerCase:         *lowerCase,
 		UpperCase:         *upperCase,
 		Numbers:           *numbers,
