@@ -19,7 +19,7 @@ func (app *application) routes() http.Handler {
 	mux.HandlerFunc(http.MethodGet, "/generate", app.generate)
 	mux.HandlerFunc(http.MethodGet, "/generate/bulk", app.generateBulk)
 	mux.HandlerFunc(http.MethodGet, "/api/v1/generate", app.apiGenerate)
-	mux.HandlerFunc(http.MethodGet, "/api/v1/generate/:count", app.apiGenerate)
+	mux.HandlerFunc(http.MethodGet, "/api/v1/generate/bulk", app.apiGenerateBulk)
 
 	return mw.Then(mux)
 }

@@ -133,7 +133,7 @@ func TestRandomString(t *testing.T) {
 
 		results, _ := RandomString(&config)
 		length := len(results)
-		if length != 100 {
+		if length != want {
 			t.Errorf("Expected %d random strings, got %d", want, length)
 		}
 	})

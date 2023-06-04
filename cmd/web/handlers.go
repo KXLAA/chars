@@ -132,6 +132,44 @@ func (app *application) apiGenerate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *application) apiGenerateBulk(w http.ResponseWriter, r *http.Request) {
+	length, err := strconv.Atoi(r.URL.Query().Get("length"))
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+	count, err := strconv.Atoi(r.URL.Query().Get("count"))
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+	lowercase := convertToBool(r.URL.Query().Get("lowercase"))
+	uppercase := convertToBool(r.URL.Query().Get("uppercase"))
+	numbers := convertToBool(r.URL.Query().Get("numbers"))
+	symbols := convertToBool(r.URL.Query().Get("symbols"))
+
+	result, err := randstring.RandomString(&randstring.Config{
+		Count:             count,
+		Length:            length,
+		LowerCase:         lowercase,
+		UpperCase:         uppercase,
+		Numbers:           numbers,
+		SpecialCharacters: symbols,
+	})
+
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	err = response.JSON(w, http.StatusOK, map[string][]string{
+		"randomString": result,
+	})
+	if err != nil {
+		app.serverError(w, r, err)
+	}
+}
+
 func convertToBool(value string) bool {
 	if value == "on" {
 		return true
