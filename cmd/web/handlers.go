@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -10,12 +11,12 @@ import (
 )
 
 type configForm struct {
-	Count             int  `form:"Count"`
-	Length            int  `form:"Length"`
-	LowerCase         bool `form:"LowerCase"`
-	UpperCase         bool `form:"UpperCase"`
-	Numbers           bool `form:"Numbers"`
-	SpecialCharacters bool `form:"SpecialCharacters"`
+	Count             int  `form:"count"`
+	Length            int  `form:"length"`
+	LowerCase         bool `form:"lowerCase"`
+	UpperCase         bool `form:"upperCase"`
+	Numbers           bool `form:"numbers"`
+	SpecialCharacters bool `form:"symbols"`
 }
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -37,6 +38,8 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		Numbers:           form.Numbers,
 		SpecialCharacters: form.SpecialCharacters,
 	})
+
+	fmt.Println(err)
 
 	if err != nil {
 		app.serverError(w, r, err)
@@ -155,18 +158,12 @@ func (app *application) apiGenerateBulk(w http.ResponseWriter, r *http.Request) 
 }
 
 func parseUrlQuery(r *http.Request) (configForm, error) {
-	length, err := strconv.Atoi(r.URL.Query().Get("length"))
-	if err != nil {
-		return configForm{}, err
-	}
-	count, err := strconv.Atoi(r.URL.Query().Get("count"))
-	if err != nil {
-		return configForm{}, err
-	}
+	length := resolveIntQuery(r, "length", 32)
+	count := resolveIntQuery(r, "count", 1)
 	lowercase := convertToBool(r.URL.Query().Get("lowercase"))
 	uppercase := convertToBool(r.URL.Query().Get("uppercase"))
 	numbers := convertToBool(r.URL.Query().Get("numbers"))
-	symbols := convertToBool(r.URL.Query().Get("symbols"))
+	special := convertToBool(r.URL.Query().Get("special"))
 
 	return configForm{
 		Count:             count,
@@ -174,8 +171,16 @@ func parseUrlQuery(r *http.Request) (configForm, error) {
 		LowerCase:         lowercase,
 		UpperCase:         uppercase,
 		Numbers:           numbers,
-		SpecialCharacters: symbols,
+		SpecialCharacters: special,
 	}, nil
+}
+
+func resolveIntQuery(r *http.Request, key string, defaultValue int) int {
+	value, err := strconv.Atoi(r.URL.Query().Get(key))
+	if err != nil {
+		return defaultValue
+	}
+	return value
 }
 
 func convertToBool(value string) bool {

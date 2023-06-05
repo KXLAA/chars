@@ -41,10 +41,14 @@ go run ./cmd/cli -c 10 -l 64 -uc -num -sc
 
 The JSON API has the following endpoints:
 
-| Endpoint              | Method | Description                   |
-| --------------------- | ------ | ----------------------------- |
-| /characters           | `GET`  | Generate random characters    |
-| /characters?count=10  | `GET`  | Generate 10 random characters |
-| /characters?length=64 | `GET`  | Generate 64 character strings |
+| Endpoint                                 | Method | Description                                |
+| ---------------------------------------- | ------ | ------------------------------------------ |
+| /api/v1/generate                         | `GET`  | Generate random characters of length 32    |
+| /api/v1/generate?length=10               | `GET`  | Generate random character of length 10     |
+| /api/v1/generate?lowercase=true          | `GET`  | Include lower case characters              |
+| /api/v1/generate?uppercase=true          | `GET`  | Include upper case characters              |
+| /api/v1/generate?numbers=true            | `GET`  | Include numbers                            |
+| /api/v1/generate?symbols=true            | `GET`  | Include special characters                 |
+| /api/v1/generate/bulk?count=10?length=32 | `GET`  | Generate 10 random characters of length 32 |
 
 The Web app is available at <http://localhost:4444/> when you run `make run/live` in the root of the project.
