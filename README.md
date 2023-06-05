@@ -22,19 +22,19 @@ The CLI tool has the following options:
 Generate a single 32 character string with lower case characters and special characters:
 
 ```bash
-./chars
+go run ./cmd/cli
 ```
 
 Generate a single 64 character string with lower case characters, upper case characters, numbers, and special characters:
 
 ```bash
-./chars -l 64 -uc -num -sc
+go run ./cmd/cli -l 64 -uc -num -sc
 ```
 
 Generate 10 64 character strings with lower case characters, upper case characters, numbers, and special characters:
 
 ```bash
-./chars -c 10 -l 64 -uc -num -sc
+go run ./cmd/cli -c 10 -l 64 -uc -num -sc
 ```
 
 ## The JSON API
