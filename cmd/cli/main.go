@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/KXLAA/chars/pkg/randstring"
 )
@@ -15,22 +14,12 @@ func main() {
 	numbers := flag.Bool("num", false, "whether the random text contains numbers")
 	specialCharacters := flag.Bool("sc", true, "whether the random text contains special characters")
 	count := flag.Int("c", 1, "the number of random strings to generate")
+	length := flag.Int("l", 32, "the length of the random string")
 
 	flag.Parse()
 
-	//Get the length of characters to generate from the command line
-	countArgs := os.Args[1:][0]
-
-	//convert string to int
-	length, err := strconv.Atoi(countArgs)
-
-	if err != nil {
-		fmt.Println("Error: ", err)
-		os.Exit(1)
-	}
-
 	config := randstring.Config{
-		Length:            length,
+		Length:            *length,
 		Count:             *count,
 		LowerCase:         *lowerCase,
 		UpperCase:         *upperCase,
@@ -38,13 +27,16 @@ func main() {
 		SpecialCharacters: *specialCharacters,
 	}
 
-	text, error := randstring.RandomString(&config)
+	text, err := randstring.RandomString(&config)
 
-	if error != nil {
-		fmt.Println("Error: ", error)
+	if err != nil {
+		fmt.Println("Error: ", err)
 		os.Exit(1)
 		return
 	}
 
-	fmt.Println(text)
+	for _, t := range text {
+		fmt.Println(t)
+	}
+
 }

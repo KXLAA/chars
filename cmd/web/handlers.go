@@ -54,11 +54,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) generate(w http.ResponseWriter, r *http.Request) {
-	length, err := strconv.Atoi(r.URL.Query().Get("length"))
-	lowercase := convertToBool(r.URL.Query().Get("lowercase"))
-	uppercase := convertToBool(r.URL.Query().Get("uppercase"))
-	numbers := convertToBool(r.URL.Query().Get("numbers"))
-	symbols := convertToBool(r.URL.Query().Get("symbols"))
+	values, err := parseUrlQuery(r)
 
 	if err != nil {
 		app.badRequest(w, r, err)
@@ -67,11 +63,11 @@ func (app *application) generate(w http.ResponseWriter, r *http.Request) {
 
 	result, err := randstring.RandomString(&randstring.Config{
 		Count:             1,
-		Length:            length,
-		LowerCase:         lowercase,
-		UpperCase:         uppercase,
-		Numbers:           numbers,
-		SpecialCharacters: symbols,
+		Length:            values.Length,
+		LowerCase:         values.LowerCase,
+		UpperCase:         values.UpperCase,
+		Numbers:           values.Numbers,
+		SpecialCharacters: values.SpecialCharacters,
 	})
 
 	if err != nil {
@@ -83,11 +79,11 @@ func (app *application) generate(w http.ResponseWriter, r *http.Request) {
 	template["RandomString"] = result[0]
 	template["Form"] = configForm{
 		Count:             1,
-		Length:            length,
-		LowerCase:         lowercase,
-		UpperCase:         uppercase,
-		Numbers:           numbers,
-		SpecialCharacters: symbols,
+		Length:            values.Length,
+		LowerCase:         values.LowerCase,
+		UpperCase:         values.UpperCase,
+		Numbers:           values.Numbers,
+		SpecialCharacters: values.SpecialCharacters,
 	}
 
 	err = response.Page(w, http.StatusOK, template, "pages/home.html")
@@ -99,11 +95,7 @@ func (app *application) generate(w http.ResponseWriter, r *http.Request) {
 func (app *application) generateBulk(w http.ResponseWriter, r *http.Request) {}
 
 func (app *application) apiGenerate(w http.ResponseWriter, r *http.Request) {
-	length, err := strconv.Atoi(r.URL.Query().Get("length"))
-	lowercase := convertToBool(r.URL.Query().Get("lowercase"))
-	uppercase := convertToBool(r.URL.Query().Get("uppercase"))
-	numbers := convertToBool(r.URL.Query().Get("numbers"))
-	symbols := convertToBool(r.URL.Query().Get("symbols"))
+	values, err := parseUrlQuery(r)
 
 	if err != nil {
 		app.badRequest(w, r, err)
@@ -112,11 +104,11 @@ func (app *application) apiGenerate(w http.ResponseWriter, r *http.Request) {
 
 	result, err := randstring.RandomString(&randstring.Config{
 		Count:             1,
-		Length:            length,
-		LowerCase:         lowercase,
-		UpperCase:         uppercase,
-		Numbers:           numbers,
-		SpecialCharacters: symbols,
+		Length:            values.Length,
+		LowerCase:         values.LowerCase,
+		UpperCase:         values.UpperCase,
+		Numbers:           values.Numbers,
+		SpecialCharacters: values.SpecialCharacters,
 	})
 
 	if err != nil {
@@ -133,28 +125,20 @@ func (app *application) apiGenerate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) apiGenerateBulk(w http.ResponseWriter, r *http.Request) {
-	length, err := strconv.Atoi(r.URL.Query().Get("length"))
+	values, err := parseUrlQuery(r)
+
 	if err != nil {
 		app.badRequest(w, r, err)
 		return
 	}
-	count, err := strconv.Atoi(r.URL.Query().Get("count"))
-	if err != nil {
-		app.badRequest(w, r, err)
-		return
-	}
-	lowercase := convertToBool(r.URL.Query().Get("lowercase"))
-	uppercase := convertToBool(r.URL.Query().Get("uppercase"))
-	numbers := convertToBool(r.URL.Query().Get("numbers"))
-	symbols := convertToBool(r.URL.Query().Get("symbols"))
 
 	result, err := randstring.RandomString(&randstring.Config{
-		Count:             count,
-		Length:            length,
-		LowerCase:         lowercase,
-		UpperCase:         uppercase,
-		Numbers:           numbers,
-		SpecialCharacters: symbols,
+		Count:             values.Count,
+		Length:            values.Length,
+		LowerCase:         values.LowerCase,
+		UpperCase:         values.UpperCase,
+		Numbers:           values.Numbers,
+		SpecialCharacters: values.SpecialCharacters,
 	})
 
 	if err != nil {
@@ -168,6 +152,30 @@ func (app *application) apiGenerateBulk(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		app.serverError(w, r, err)
 	}
+}
+
+func parseUrlQuery(r *http.Request) (configForm, error) {
+	length, err := strconv.Atoi(r.URL.Query().Get("length"))
+	if err != nil {
+		return configForm{}, err
+	}
+	count, err := strconv.Atoi(r.URL.Query().Get("count"))
+	if err != nil {
+		return configForm{}, err
+	}
+	lowercase := convertToBool(r.URL.Query().Get("lowercase"))
+	uppercase := convertToBool(r.URL.Query().Get("uppercase"))
+	numbers := convertToBool(r.URL.Query().Get("numbers"))
+	symbols := convertToBool(r.URL.Query().Get("symbols"))
+
+	return configForm{
+		Count:             count,
+		Length:            length,
+		LowerCase:         lowercase,
+		UpperCase:         uppercase,
+		Numbers:           numbers,
+		SpecialCharacters: symbols,
+	}, nil
 }
 
 func convertToBool(value string) bool {

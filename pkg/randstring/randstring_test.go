@@ -140,7 +140,6 @@ func TestRandomString(t *testing.T) {
 
 }
 
-// function that checks if the string contains lowercase characters
 func containsUpperCase(s string) bool {
 	for _, c := range s {
 		if c >= 'A' && c <= 'Z' {
@@ -150,7 +149,6 @@ func containsUpperCase(s string) bool {
 	return false
 }
 
-// function that checks if the string contains uppercase characters
 func containsLowerCase(s string) bool {
 	for _, c := range s {
 		if c >= 'a' && c <= 'z' {
@@ -160,7 +158,6 @@ func containsLowerCase(s string) bool {
 	return false
 }
 
-// function that checks if the string contains numbers
 func containsNumbers(s string) bool {
 	for _, c := range s {
 		if c >= '0' && c <= '9' {
@@ -170,7 +167,6 @@ func containsNumbers(s string) bool {
 	return false
 }
 
-// function that checks if the string contains special characters
 func containsSpecialCharacters(s string) bool {
 	for _, c := range s {
 		if c >= '!' && c <= '+' {
