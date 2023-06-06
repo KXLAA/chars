@@ -21,6 +21,17 @@
   --silver-800: #6c6c6c;
   --silver-900: #505050;
 
+  --red-50: #ffebee;
+  --red-100: #ffcdd2;
+  --red-200: #ef9a9a;
+  --red-300: #e57373;
+  --red-400: #ef5350;
+  --red-500: #f44336;
+  --red-600: #e53935;
+  --red-700: #d32f2f;
+  --red-800: #c62828;
+  --red-900: #b71c1c;
+
   --background-image: radial-gradient(rgb(31, 31, 31) 11.6%, transparent 11.6%),
     radial-gradient(rgb(31, 31, 31) 11.6%, transparent 11.6%);
   --background: #0a0a0a;
@@ -213,6 +224,17 @@ h1 {
   overflow: hidden;
   border-bottom-right-radius: 0.5rem;
   border-bottom-left-radius: 0.25rem;
+}
+
+.generator__error-message {
+  font-size: 0.8rem;
+  font-weight: 600;
+  background-color: var(--red-900);
+  color: var(--red-200);
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  white-space: normal;
+  word-break: break-all;
 }
 
 .form-control__checkbox {

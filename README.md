@@ -52,3 +52,13 @@ The JSON API has the following endpoints:
 | /api/v1/generate/bulk?count=10?length=32 | `GET`  | Generate 10 random characters of length 32 |
 
 The Web app is available at <http://localhost:4444/> when you run `make run/live` in the root of the project.
+
+## TODS's
+
+- [ ] Add tests to HTTP handlers
+- [ ] Add integration & E2E tests for CLI tool
+- [x] Form validation & error handling for the web app
+- [ ] CI/CD for repo
+- [ ] Distribute CLI tool as a binary for Linux, Windows, and Mac
+- [ ] Deploy web app
+- [ ] Migrate to HTTPS for web app
