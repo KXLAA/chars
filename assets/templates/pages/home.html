@@ -5,9 +5,7 @@
   <div>
     <p>Random Character Generator</p>
     <span class="generator__output">
-      <span class="generator__output__text" id="generator__output__text"
-        >{{.RandomString}}</span
-      >
+      <span class="generator__output__text" id="generator__output__text">{{.RandomString}}</span>
       <button class="generator__output__copy" id="copy-button">
         <svg
           width="28"
@@ -49,6 +47,9 @@
   </div>
   <form class="generator__output__controls" action="/generate" method="GET">
     <label class="form-control">
+      {{with .Form.Validator.FieldErrors.Length}}
+      <span class="generator__error-message">{{.}}</span>
+      {{end}}
       <input
         type="number"
         name="length"
@@ -86,13 +87,15 @@
     <label class="form-control__checkbox">
       <input
         type="checkbox"
-        name="symbols"
+        name="special"
         {{if
-        .Form.SpecialCharacters}}checked{{end}}
+        .Form.Special}}checked{{end}}
       />
       SYMBOLS
     </label>
-
+    {{with .Form.Validator.FieldErrors.Empty}}
+    <span class="generator__error-message">{{.}}</span>
+    {{end}}
     <button class="btn btn--primary">Generate</button>
   </form>
 </section>

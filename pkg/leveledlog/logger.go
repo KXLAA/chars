@@ -60,6 +60,12 @@ func NewLogger(out io.Writer, minLevel Level, colorize bool) *Logger {
 	}
 }
 
+func NewMockLogger() *Logger {
+	return &Logger{
+		out: io.Discard,
+	}
+}
+
 func (l *Logger) Info(format string, v ...any) {
 	message := fmt.Sprintf(format, v...)
 	l.print(LevelInfo, message, nil)

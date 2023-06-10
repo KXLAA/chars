@@ -17,9 +17,7 @@ func (app *application) routes() http.Handler {
 	mux.Handler("GET", "/static/*filepath", fileServer)
 	mux.HandlerFunc(http.MethodGet, "/", app.home)
 	mux.HandlerFunc(http.MethodGet, "/generate", app.generate)
-	mux.HandlerFunc(http.MethodGet, "/generate/bulk", app.generateBulk)
 	mux.HandlerFunc(http.MethodGet, "/api/v1/generate", app.apiGenerate)
-	mux.HandlerFunc(http.MethodGet, "/api/v1/generate/bulk", app.apiGenerateBulk)
 
 	return mw.Then(mux)
 }
