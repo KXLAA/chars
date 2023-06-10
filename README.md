@@ -55,10 +55,11 @@ The Web app is available at <http://localhost:4444/> when you run `make run/live
 
 ## TODS's
 
-- [ ] Add tests to HTTP handlers
+- [x] Add tests to HTTP handlers
 - [ ] Add integration & E2E tests for CLI tool
 - [x] Form validation & error handling for the web app
 - [ ] CI/CD for repo
 - [ ] Distribute CLI tool as a binary for Linux, Windows, and Mac
 - [ ] Deploy web app
 - [ ] Migrate to HTTPS for web app
+- [ ] Add copied flashed message to web app
