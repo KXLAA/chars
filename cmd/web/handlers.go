@@ -2,35 +2,23 @@ package main
 
 import (
 	"net/http"
-	"strconv"
 
-	"github.com/KXLAA/chars/pkg/randstring"
+	rnd "github.com/KXLAA/chars/pkg/randstring"
 	"github.com/KXLAA/chars/pkg/response"
-	"github.com/KXLAA/chars/pkg/validator"
 )
-
-type configForm struct {
-	Count     int                 `form:"count"`
-	Length    int                 `form:"length"`
-	LowerCase bool                `form:"lowercase"`
-	UpperCase bool                `form:"uppercase"`
-	Numbers   bool                `form:"numbers"`
-	Special   bool                `form:"special"`
-	Validator validator.Validator `form:"-"`
-}
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
-	var form configForm
+	form := &configForm{
+		Length:    randomNumber(32, 54),
+		Count:     1,
+		LowerCase: true,
+		UpperCase: true,
+		Numbers:   true,
+		Special:   true,
+	}
 
-	form.Length = randomNumber(32, 54)
-	form.Count = 1
-	form.LowerCase = true
-	form.UpperCase = true
-	form.Numbers = true
-	form.Special = true
-
-	result, err := randstring.RandomString(&randstring.Config{
+	result, err := rnd.RandomString(&rnd.Config{
 		Length:            form.Length,
 		Count:             form.Count,
 		LowerCase:         form.LowerCase,
@@ -54,15 +42,15 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) generate(w http.ResponseWriter, r *http.Request) {
-	//handle GET request to /generate with no query params
+	//handle get requests to /generate ie no query params
 	if len(r.URL.Query()) == 0 {
-		data, err := app.parseUrlQueryWithDefaults(r)
+		data, err := app.parseUrlQueriesWithDefaults(r)
 		if err != nil {
 			app.badRequest(w, r, err)
 			return
 		}
 
-		result, err := randstring.RandomString(&randstring.Config{
+		result, err := rnd.RandomString(&rnd.Config{
 			Count:             data.Count,
 			Length:            data.Length,
 			LowerCase:         data.LowerCase,
@@ -88,21 +76,10 @@ func (app *application) generate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form := configForm{}
-	form.Length = resolveIntQuery(r, "length", 0)
-	form.Count = resolveIntQuery(r, "count", 1)
-	form.LowerCase = resolveBoolQuery(r, "lowercase")
-	form.UpperCase = resolveBoolQuery(r, "uppercase")
-	form.Numbers = resolveBoolQuery(r, "numbers")
-	form.Special = resolveBoolQuery(r, "special")
-	form.Validator.CheckField(form.Length > 0, "Length", "length must be greater than 0")
-	if !form.LowerCase && !form.UpperCase && !form.Numbers && !form.Special {
-		form.Validator.AddFieldError("Empty", "At least one option must be selected")
-
-	}
+	form := app.parseForm(w, r)
+	data := app.newTemplateData(r)
 
 	if form.Validator.HasErrors() {
-		data := app.newTemplateData(r)
 		data["Form"] = form
 		data["RandomString"] = "AN ERROR OCCURRED"
 
@@ -115,7 +92,7 @@ func (app *application) generate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := randstring.RandomString(&randstring.Config{
+	result, err := rnd.RandomString(&rnd.Config{
 		Count:             form.Count,
 		Length:            form.Length,
 		LowerCase:         form.LowerCase,
@@ -140,15 +117,15 @@ func (app *application) generate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) apiGenerate(w http.ResponseWriter, r *http.Request) {
+	// handle GET requests to /api/v1/generate
 	if len(r.URL.Query()) == 0 {
-		values, err := app.parseUrlQueryWithDefaults(r)
-
+		values, err := app.parseUrlQueriesWithDefaults(r)
 		if err != nil {
 			app.badRequest(w, r, err)
 			return
 		}
 
-		result, err := randstring.RandomString(&randstring.Config{
+		result, err := rnd.RandomString(&rnd.Config{
 			Count:             values.Count,
 			Length:            values.Length,
 			LowerCase:         values.LowerCase,
@@ -174,47 +151,25 @@ func (app *application) apiGenerate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form := configForm{}
-	length, err := strconv.Atoi(r.URL.Query().Get("length"))
-
+	length, err := parseLengthValue(w, r)
 	if err != nil {
-		err = response.JSON(w, http.StatusBadRequest, map[string]string{
-			"error": ErrInvalidQueryParams.Error(),
-		})
-
-		if err != nil {
-			app.badRequest(w, r, err)
-			return
-		}
-
+		app.badRequest(w, r, err)
+		return
+	}
+	count, err := parseCount(w, r)
+	if err != nil {
+		app.badRequest(w, r, err)
 		return
 	}
 
-	var count int
-	if r.URL.Query().Get("count") == "" {
-		count = 1
-	} else {
-		count, err = strconv.Atoi(r.URL.Query().Get("count"))
-		if err != nil {
-			err = response.JSON(w, http.StatusBadRequest, map[string]string{
-				"error": ErrInvalidQueryParams.Error(),
-			})
-
-			if err != nil {
-				app.badRequest(w, r, err)
-				return
-			}
-
-			return
-		}
+	form := configForm{
+		Length:    length,
+		Count:     count,
+		LowerCase: resolveBoolQuery(r, "lowercase"),
+		UpperCase: resolveBoolQuery(r, "uppercase"),
+		Numbers:   resolveBoolQuery(r, "numbers"),
+		Special:   resolveBoolQuery(r, "special"),
 	}
-
-	form.Length = length
-	form.Count = count
-	form.LowerCase = resolveBoolQuery(r, "lowercase")
-	form.UpperCase = resolveBoolQuery(r, "uppercase")
-	form.Numbers = resolveBoolQuery(r, "numbers")
-	form.Special = resolveBoolQuery(r, "special")
 
 	if !form.LowerCase && !form.UpperCase && !form.Numbers && !form.Special {
 		err = response.JSON(w, http.StatusBadRequest, map[string]string{
@@ -230,7 +185,7 @@ func (app *application) apiGenerate(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	result, err := randstring.RandomString(&randstring.Config{
+	result, err := rnd.RandomString(&rnd.Config{
 		Count:             form.Count,
 		Length:            form.Length,
 		LowerCase:         form.LowerCase,
