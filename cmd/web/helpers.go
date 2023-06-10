@@ -5,8 +5,20 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/KXLAA/chars/pkg/response"
+	"github.com/KXLAA/chars/pkg/validator"
 	"github.com/KXLAA/chars/pkg/version"
 )
+
+type configForm struct {
+	Count     int                 `form:"count"`
+	Length    int                 `form:"length"`
+	LowerCase bool                `form:"lowercase"`
+	UpperCase bool                `form:"uppercase"`
+	Numbers   bool                `form:"numbers"`
+	Special   bool                `form:"special"`
+	Validator validator.Validator `form:"-"`
+}
 
 func (app *application) newTemplateData(r *http.Request) map[string]any {
 	data := map[string]any{
@@ -24,18 +36,14 @@ func (app *application) parseForm(w http.ResponseWriter, r *http.Request) config
 	form.UpperCase = resolveBoolQuery(r, "uppercase")
 	form.Numbers = resolveBoolQuery(r, "numbers")
 	form.Special = resolveBoolQuery(r, "special")
-	form.Validator.CheckField(form.Length > 0, "Length", "length must be greater than 0")
+	form.Validator.CheckField(form.Length > 0, "Length", "Length must be greater than 0")
+	form.Validator.CheckField(form.Length <= 100, "Length", "Length must be less than 100")
 	if !form.LowerCase && !form.UpperCase && !form.Numbers && !form.Special {
 		form.Validator.AddFieldError("Empty", "At least one option must be selected")
 	}
 
 	return form
 }
-
-// func (app *application) parseUrlQueries(w http.ResponseWriter, r *http.Request) {
-// 	form := configForm{}
-
-// }
 
 func (app *application) parseUrlQueriesWithDefaults(r *http.Request) (configForm, error) {
 	length := resolveIntQuery(r, "length", 32)
@@ -94,4 +102,36 @@ func convertToBool(value string) bool {
 	}
 
 	return value == "true"
+}
+
+func parseLengthValue(w http.ResponseWriter, r *http.Request) (int, error) {
+	length, err := strconv.Atoi(r.URL.Query().Get("length"))
+
+	if err != nil {
+		err = response.JSON(w, http.StatusBadRequest, map[string]string{
+			"error": ErrInvalidQueryParams.Error(),
+		})
+
+		return 0, err
+	}
+
+	return length, nil
+}
+
+func parseCount(w http.ResponseWriter, r *http.Request) (int, error) {
+	var count int
+	var err error
+	if r.URL.Query().Get("count") == "" {
+		count = 1
+	} else {
+		count, err = strconv.Atoi(r.URL.Query().Get("count"))
+		if err != nil {
+			err = response.JSON(w, http.StatusBadRequest, map[string]string{
+				"error": ErrInvalidQueryParams.Error(),
+			})
+			return 0, err
+		}
+	}
+
+	return count, nil
 }

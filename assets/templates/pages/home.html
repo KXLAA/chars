@@ -2,7 +2,7 @@
 "page:main"}}
 
 <section class="generator">
-  <div>
+  <div class="generator_container">
     <p>Random Character Generator</p>
     <span class="generator__output">
       <span class="generator__output__text" id="generator__output__text">{{.RandomString}}</span>
@@ -47,56 +47,62 @@
   </div>
   <form class="generator__output__controls" action="/generate" method="GET">
     <label class="form-control">
-      {{with .Form.Validator.FieldErrors.Length}}
-      <span class="generator__error-message">{{.}}</span>
-      {{end}}
       <input
         type="number"
         name="length"
         placeholder="Length"
         value="{{.Form.Length}}"
+        class="form-control__input {{with
+        .Form.Validator.FieldErrors.Length}}form-control__input--error{{end}}"
+        max="100"
       />
+      {{with .Form.Validator.FieldErrors.Length}}
+      <span class="generator__error-message">{{.}}</span>
+      {{end}}
     </label>
-    <label class="form-control__checkbox">
+
+    <div class="form-control__group">
+       <label class="form-control__checkbox">
+        LOWER CASE
       <input
         type="checkbox"
         name="lowercase"
         {{if
         .Form.LowerCase}}checked{{end}}
       />
-      LOWER CASE
     </label>
     <label class="form-control__checkbox">
+      UPPER CASE
       <input
         type="checkbox"
         name="uppercase"
         {{if
         .Form.UpperCase}}checked{{end}}
       />
-      UPPER CASE
     </label>
     <label class="form-control__checkbox">
+      NUMBERS
       <input
         type="checkbox"
         name="numbers"
         {{if
         .Form.Numbers}}checked{{end}}
       />
-      NUMBERS
     </label>
     <label class="form-control__checkbox">
+      SYMBOLS
       <input
         type="checkbox"
         name="special"
         {{if
         .Form.Special}}checked{{end}}
       />
-      SYMBOLS
     </label>
+    </div>
     {{with .Form.Validator.FieldErrors.Empty}}
     <span class="generator__error-message">{{.}}</span>
     {{end}}
-    <button class="btn btn--primary">Generate</button>
+    <button class="generator__button">Generate</button>
   </form>
 </section>
 {{end}}

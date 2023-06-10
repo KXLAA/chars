@@ -159,7 +159,7 @@ h1 {
   border: 1px solid var(--shark-700);
 }
 
-.generator div {
+.generator_container {
   width: 100%;
   padding-left: 1rem;
   padding-right: 1rem;
@@ -230,18 +230,77 @@ h1 {
   font-size: 0.8rem;
   font-weight: 600;
   background-color: var(--red-900);
-  color: var(--red-200);
-  padding: 0.25rem;
+  color: var(--red-100);
+  padding: 0.10rem;
   border-radius: 0.25rem;
-  white-space: normal;
-  word-break: break-all;
+  width: 100%;
+  text-align: center;
 }
 
 .form-control__checkbox {
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-weight: bold;
-  line-height: 1.1;
-  display: grid;
-  grid-template-columns: 1em auto;
-  gap: 0.5em;
+  display: flex;
+  gap: 0.2em;
+  background-color: var(--shark-500);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  width: 100%;
+  justify-content: space-between;
+}
+
+
+.form-control__input {
+  font-size: 1.25rem;
+  font-weight: 600;
+  background-color: var(--shark-500);
+  color: var(--silver-500);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: none;
+}
+
+.form-control__input--error {
+  border: 1px solid var(--red-700);
+}
+
+.form-control__input:placeholder {
+  color: var(--silver-500);
+}
+
+.form-control__label {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.form-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.form-control__group {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  width: 100%;
+}
+
+.generator__button {
+  font-size: 1.25rem;
+  font-weight: 600;
+  background-color: var(--shark-500);
+  color: var(--silver-500);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: none;
+  width: 100%;
+}
+
+.generator__button:hover {
+  background-color: var(--shark-600);
+  color: var(--silver-900);
+  transition: background-color color 0.2s ease-in-out;
+  cursor: pointer;
 }
