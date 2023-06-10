@@ -1,7 +1,6 @@
 package main
 
 import (
-	"math/rand"
 	"net/http"
 	"strconv"
 
@@ -52,13 +51,12 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		app.serverError(w, r, err)
 	}
-
 }
 
 func (app *application) generate(w http.ResponseWriter, r *http.Request) {
-
+	//handle GET request to /generate with no query params
 	if len(r.URL.Query()) == 0 {
-		data, err := parseUrlQueryWithDefaults(r)
+		data, err := app.parseUrlQueryWithDefaults(r)
 		if err != nil {
 			app.badRequest(w, r, err)
 			return
@@ -141,23 +139,104 @@ func (app *application) generate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *application) generateBulk(w http.ResponseWriter, r *http.Request) {}
-
 func (app *application) apiGenerate(w http.ResponseWriter, r *http.Request) {
-	values, err := parseUrlQueryWithDefaults(r)
+	if len(r.URL.Query()) == 0 {
+		values, err := app.parseUrlQueryWithDefaults(r)
+
+		if err != nil {
+			app.badRequest(w, r, err)
+			return
+		}
+
+		result, err := randstring.RandomString(&randstring.Config{
+			Count:             values.Count,
+			Length:            values.Length,
+			LowerCase:         values.LowerCase,
+			UpperCase:         values.UpperCase,
+			Numbers:           values.Numbers,
+			SpecialCharacters: values.Special,
+		})
+
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+
+		err = response.JSON(w, http.StatusOK, map[string]string{
+			"randomString": result[0],
+		})
+
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+
+		return
+	}
+
+	form := configForm{}
+	length, err := strconv.Atoi(r.URL.Query().Get("length"))
 
 	if err != nil {
-		app.badRequest(w, r, err)
+		err = response.JSON(w, http.StatusBadRequest, map[string]string{
+			"error": ErrInvalidQueryParams.Error(),
+		})
+
+		if err != nil {
+			app.badRequest(w, r, err)
+			return
+		}
+
 		return
+	}
+
+	var count int
+	if r.URL.Query().Get("count") == "" {
+		count = 1
+	} else {
+		count, err = strconv.Atoi(r.URL.Query().Get("count"))
+		if err != nil {
+			err = response.JSON(w, http.StatusBadRequest, map[string]string{
+				"error": ErrInvalidQueryParams.Error(),
+			})
+
+			if err != nil {
+				app.badRequest(w, r, err)
+				return
+			}
+
+			return
+		}
+	}
+
+	form.Length = length
+	form.Count = count
+	form.LowerCase = resolveBoolQuery(r, "lowercase")
+	form.UpperCase = resolveBoolQuery(r, "uppercase")
+	form.Numbers = resolveBoolQuery(r, "numbers")
+	form.Special = resolveBoolQuery(r, "special")
+
+	if !form.LowerCase && !form.UpperCase && !form.Numbers && !form.Special {
+		err = response.JSON(w, http.StatusBadRequest, map[string]string{
+			"error": ErrIncompleteQueryParams.Error(),
+		})
+
+		if err != nil {
+			app.badRequest(w, r, err)
+			return
+		}
+
+		return
+
 	}
 
 	result, err := randstring.RandomString(&randstring.Config{
-		Count:             1,
-		Length:            values.Length,
-		LowerCase:         values.LowerCase,
-		UpperCase:         values.UpperCase,
-		Numbers:           values.Numbers,
-		SpecialCharacters: values.Special,
+		Count:             form.Count,
+		Length:            form.Length,
+		LowerCase:         form.LowerCase,
+		UpperCase:         form.UpperCase,
+		Numbers:           form.Numbers,
+		SpecialCharacters: form.Special,
 	})
 
 	if err != nil {
@@ -165,99 +244,18 @@ func (app *application) apiGenerate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = response.JSON(w, http.StatusOK, map[string]string{
-		"randomString": result[0],
-	})
-	if err != nil {
-		app.serverError(w, r, err)
+	if form.Count > 1 {
+		err = response.JSON(w, http.StatusOK, map[string][]string{
+			"randomString": result,
+		})
+	} else {
+		err = response.JSON(w, http.StatusOK, map[string]string{
+			"randomString": result[0],
+		})
 	}
-}
-
-func (app *application) apiGenerateBulk(w http.ResponseWriter, r *http.Request) {
-	values, err := parseUrlQueryWithDefaults(r)
-
-	if err != nil {
-		app.badRequest(w, r, err)
-		return
-	}
-
-	result, err := randstring.RandomString(&randstring.Config{
-		Count:             values.Count,
-		Length:            values.Length,
-		LowerCase:         values.LowerCase,
-		UpperCase:         values.UpperCase,
-		Numbers:           values.Numbers,
-		SpecialCharacters: values.Special,
-	})
 
 	if err != nil {
 		app.serverError(w, r, err)
 		return
 	}
-
-	err = response.JSON(w, http.StatusOK, map[string][]string{
-		"randomString": result,
-	})
-	if err != nil {
-		app.serverError(w, r, err)
-	}
-}
-
-func parseUrlQueryWithDefaults(r *http.Request) (configForm, error) {
-	length := resolveIntQuery(r, "length", 32)
-	count := resolveIntQuery(r, "count", 1)
-	lowercase := resolveBoolQueryWithDefaults(r, "lowercase", true)
-	uppercase := resolveBoolQueryWithDefaults(r, "uppercase", false)
-	numbers := resolveBoolQueryWithDefaults(r, "numbers", false)
-	special := resolveBoolQueryWithDefaults(r, "special", true)
-
-	return configForm{
-		Count:     count,
-		Length:    length,
-		LowerCase: lowercase,
-		UpperCase: uppercase,
-		Numbers:   numbers,
-		Special:   special,
-	}, nil
-}
-
-func resolveIntQuery(r *http.Request, key string, defaultValue int) int {
-	value, err := strconv.Atoi(r.URL.Query().Get(key))
-	if err != nil {
-		return defaultValue
-	}
-	return value
-}
-
-func resolveBoolQuery(r *http.Request, key string) bool {
-	value := r.URL.Query().Get(key)
-	if value == "" {
-		return false
-	}
-
-	//convert to bool for consistency with checkbox values ion HTML
-	return convertToBool(value)
-}
-
-func resolveBoolQueryWithDefaults(r *http.Request, key string, defaultValue bool) bool {
-	value := r.URL.Query().Get(key)
-	if value == "" {
-		return defaultValue
-	}
-
-	//convert to bool for consistency with checkbox values ion HTML
-	return convertToBool(value)
-}
-
-func randomNumber(min, max int) int {
-	return min + rand.Intn(max-min)
-}
-
-func convertToBool(value string) bool {
-	//convert to bool for consistency with checkbox values ion HTML
-	if value == "on" {
-		return true
-	}
-
-	return value == "true"
 }

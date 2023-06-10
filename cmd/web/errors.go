@@ -1,9 +1,15 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime/debug"
+)
+
+var (
+	ErrIncompleteQueryParams = errors.New("looks like your query params are incomplete. Please make sure lowercase, uppercase, numbers, or special are set to true in your query params")
+	ErrInvalidQueryParams    = errors.New("looks like your query params are invalid. Please make sure the length and count query params are numbers")
 )
 
 func (app *application) reportError(err error) {
