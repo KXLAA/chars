@@ -16,7 +16,28 @@ func (app *application) newTemplateData(r *http.Request) map[string]any {
 	return data
 }
 
-func (app *application) parseUrlQueryWithDefaults(r *http.Request) (configForm, error) {
+func (app *application) parseForm(w http.ResponseWriter, r *http.Request) configForm {
+	form := configForm{}
+	form.Length = resolveIntQuery(r, "length", 0)
+	form.Count = resolveIntQuery(r, "count", 1)
+	form.LowerCase = resolveBoolQuery(r, "lowercase")
+	form.UpperCase = resolveBoolQuery(r, "uppercase")
+	form.Numbers = resolveBoolQuery(r, "numbers")
+	form.Special = resolveBoolQuery(r, "special")
+	form.Validator.CheckField(form.Length > 0, "Length", "length must be greater than 0")
+	if !form.LowerCase && !form.UpperCase && !form.Numbers && !form.Special {
+		form.Validator.AddFieldError("Empty", "At least one option must be selected")
+	}
+
+	return form
+}
+
+// func (app *application) parseUrlQueries(w http.ResponseWriter, r *http.Request) {
+// 	form := configForm{}
+
+// }
+
+func (app *application) parseUrlQueriesWithDefaults(r *http.Request) (configForm, error) {
 	length := resolveIntQuery(r, "length", 32)
 	count := resolveIntQuery(r, "count", 1)
 	lowercase := resolveBoolQueryWithDefaults(r, "lowercase", true)

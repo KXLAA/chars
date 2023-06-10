@@ -56,7 +56,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 func (app *application) generate(w http.ResponseWriter, r *http.Request) {
 	//handle GET request to /generate with no query params
 	if len(r.URL.Query()) == 0 {
-		data, err := app.parseUrlQueryWithDefaults(r)
+		data, err := app.parseUrlQueriesWithDefaults(r)
 		if err != nil {
 			app.badRequest(w, r, err)
 			return
@@ -88,19 +88,7 @@ func (app *application) generate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form := configForm{}
-	form.Length = resolveIntQuery(r, "length", 0)
-	form.Count = resolveIntQuery(r, "count", 1)
-	form.LowerCase = resolveBoolQuery(r, "lowercase")
-	form.UpperCase = resolveBoolQuery(r, "uppercase")
-	form.Numbers = resolveBoolQuery(r, "numbers")
-	form.Special = resolveBoolQuery(r, "special")
-	form.Validator.CheckField(form.Length > 0, "Length", "length must be greater than 0")
-	if !form.LowerCase && !form.UpperCase && !form.Numbers && !form.Special {
-		form.Validator.AddFieldError("Empty", "At least one option must be selected")
-
-	}
-
+	form := app.parseForm(w, r)
 	if form.Validator.HasErrors() {
 		data := app.newTemplateData(r)
 		data["Form"] = form
@@ -141,7 +129,7 @@ func (app *application) generate(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) apiGenerate(w http.ResponseWriter, r *http.Request) {
 	if len(r.URL.Query()) == 0 {
-		values, err := app.parseUrlQueryWithDefaults(r)
+		values, err := app.parseUrlQueriesWithDefaults(r)
 
 		if err != nil {
 			app.badRequest(w, r, err)
