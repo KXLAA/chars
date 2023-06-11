@@ -247,6 +247,7 @@ h1 {
   border-radius: 0.25rem;
   width: 100%;
   justify-content: space-between;
+  cursor: pointer;
 }
 
 
