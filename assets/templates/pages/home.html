@@ -5,14 +5,18 @@
   <div class="generator_container">
     <p>Random Character Generator</p>
     <span class="generator__output">
-      <span class="generator__output__text" id="generator__output__text">{{.RandomString}}</span>
+      <span class="generator__output__text" id="generator__output__text"
+        >{{.RandomString}}</span
+      >
       <button class="generator__output__copy" id="copy-button">
         <svg
           width="28"
+          class="copy-icon"
           height="28"
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
           xmlns:xlink="http://www.w3.org/1999/xlink"
+          id="copy-icon"
         >
           <rect
             width="28"
@@ -42,6 +46,43 @@
             />
           </g>
         </svg>
+        <svg
+          class="copied-message"
+          id="flash-message"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+        >
+          <rect
+            width="24"
+            height="24"
+            stroke="none"
+            fill="currentColor"
+            opacity="0"
+          />
+
+          <g transform="matrix(1 0 0 1 12 12)">
+            <path
+              style="
+                stroke: none;
+                stroke-width: 1;
+                stroke-dasharray: none;
+                stroke-linecap: butt;
+                stroke-dashoffset: 0;
+                stroke-linejoin: miter;
+                stroke-miterlimit: 4;
+                fill: currentColor;
+                fill-rule: nonzero;
+                opacity: 1;
+              "
+              transform=" translate(-12, -12)"
+              d="M 11 16.4 L 6.3 11.7 L 7.699999999999999 10.299999999999999 L 11 13.599999999999998 L 19.4 5.1999999999999975 C 17.5 3.3 14.9 2 12 2 C 6.5 2 2 6.5 2 12 C 2 17.5 6.5 22 12 22 C 17.5 22 22 17.5 22 12 C 22 10.1 21.5 8.4 20.6 6.9 L 11 16.4 z"
+              stroke-linecap="round"
+            />
+          </g>
+        </svg>
       </button>
     </span>
   </div>
@@ -62,42 +103,42 @@
     </label>
 
     <div class="form-control__group">
-       <label class="form-control__checkbox">
+      <label class="form-control__checkbox">
         LOWER CASE
-      <input
-        type="checkbox"
-        name="lowercase"
-        {{if
-        .Form.LowerCase}}checked{{end}}
-      />
-    </label>
-    <label class="form-control__checkbox">
-      UPPER CASE
-      <input
-        type="checkbox"
-        name="uppercase"
-        {{if
-        .Form.UpperCase}}checked{{end}}
-      />
-    </label>
-    <label class="form-control__checkbox">
-      NUMBERS
-      <input
-        type="checkbox"
-        name="numbers"
-        {{if
-        .Form.Numbers}}checked{{end}}
-      />
-    </label>
-    <label class="form-control__checkbox">
-      SYMBOLS
-      <input
-        type="checkbox"
-        name="special"
-        {{if
-        .Form.Special}}checked{{end}}
-      />
-    </label>
+        <input
+          type="checkbox"
+          name="lowercase"
+          {{if
+          .Form.LowerCase}}checked{{end}}
+        />
+      </label>
+      <label class="form-control__checkbox">
+        UPPER CASE
+        <input
+          type="checkbox"
+          name="uppercase"
+          {{if
+          .Form.UpperCase}}checked{{end}}
+        />
+      </label>
+      <label class="form-control__checkbox">
+        NUMBERS
+        <input
+          type="checkbox"
+          name="numbers"
+          {{if
+          .Form.Numbers}}checked{{end}}
+        />
+      </label>
+      <label class="form-control__checkbox">
+        SYMBOLS
+        <input
+          type="checkbox"
+          name="special"
+          {{if
+          .Form.Special}}checked{{end}}
+        />
+      </label>
     </div>
     {{with .Form.Validator.FieldErrors.Empty}}
     <span class="generator__error-message">{{.}}</span>

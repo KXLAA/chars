@@ -231,7 +231,7 @@ h1 {
   font-weight: 600;
   background-color: var(--red-900);
   color: var(--red-100);
-  padding: 0.10rem;
+  padding: 0.1rem;
   border-radius: 0.25rem;
   width: 100%;
   text-align: center;
@@ -249,7 +249,6 @@ h1 {
   justify-content: space-between;
   cursor: pointer;
 }
-
 
 .form-control__input {
   font-size: 1.25rem;
@@ -304,4 +303,17 @@ h1 {
   color: var(--silver-900);
   transition: background-color color 0.2s ease-in-out;
   cursor: pointer;
+}
+
+.copied-message {
+  display: none;
+  color: var(--silver-500);
+}
+
+.flash {
+  display: block;
+}
+
+.hide {
+  display: none !important;
 }

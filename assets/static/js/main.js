@@ -1,28 +1,20 @@
 const elementToc = document.getElementById("generator__output__text");
+//add onclike event to copy button
+const copyButton = document.getElementById("copy-button");
+const flashMessage = document.getElementById("flash-message");
+const copyIcon = document.getElementById("copy-icon");
 
 // Add class to copied element to denote success
 function flashElement(element) {
   element.classList.add("flash");
-  document.addEventListener("transitionend", function () {
-    setTimeout(function () {
-      element.classList.remove("flash");
-    }, 1000);
-  });
+  copyIcon.classList.add("hidden");
+  setTimeout(() => {
+    element.classList.remove("flash");
+    copyIcon.classList.remove("hidden");
+  }, 800);
 }
-
-//add onclike event to copy button
-const copyButton = document.getElementById("copy-button");
-const flashMessage = document.getElementById("flash-message");
 
 copyButton.addEventListener("click", () => {
   navigator.clipboard.writeText(elementToc.innerText);
+  flashElement(flashMessage);
 });
-
-function fetchRandom() {
-  fetch("/random")
-    .then((response) => response.json())
-    .then((data) => {
-      elementToc.innerText = data;
-      flashElement(flashMessage);
-    });
-}
