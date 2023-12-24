@@ -30,7 +30,7 @@ func generateRandomString(config *Config) (string, error) {
 	// Create a new random number generator with a time-based seed
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	// The pool of characters to choose from
-	pool := resolveCharacters(config.LowerCase, config.UpperCase, config.Numbers, config.SpecialCharacters)
+	pool := resolveCharacters(config)
 
 	// Generate a random string of the specified length
 	result := make([]byte, config.Length)
@@ -43,27 +43,27 @@ func generateRandomString(config *Config) (string, error) {
 	return string(result), nil
 }
 
-func resolveCharacters(lowerCase bool, upperCase bool, numbers bool, specialCharacters bool) string {
+func resolveCharacters(config *Config) string {
 	var finalPool string
 
 	loweCasePool := "abcdefghijklmnopqrstuvwxyz"
 	upperCasePool := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	numbersPool := "0123456789"
-	specialCharactersPool := "!@#$%^&*()_+"
+	specialCharactersPool := "!@#$%^&*()_-+=~`[]{}\\|:;\"'<>,.?/"
 
-	if lowerCase {
+	if config.LowerCase {
 		finalPool += loweCasePool
 	}
 
-	if upperCase {
+	if config.UpperCase {
 		finalPool += upperCasePool
 	}
 
-	if numbers {
+	if config.Numbers {
 		finalPool += numbersPool
 	}
 
-	if specialCharacters {
+	if config.SpecialCharacters {
 		finalPool += specialCharactersPool
 	}
 
